@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="asn_codecs_prim.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ber_decoder.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ber_tlv_length.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ber_tlv_tag.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BIT_STRING.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="constr_SEQUENCE.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="constr_TYPE.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="constraints.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="converter-sample.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="der_encoder.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="INTEGER.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="NativeEnumerated.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="NativeInteger.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="OCTET_STRING.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="pdu_collection.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="per_decoder.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="per_encoder.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="per_support.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Rectangle.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="xer_decoder.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="xer_encoder.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="xer_support.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="xer_support.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="xer_encoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="xer_decoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Rectangle.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="per_support.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="per_encoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="per_decoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="OCTET_STRING.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NativeInteger.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NativeEnumerated.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="INTEGER.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="der_encoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="constraints.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="constr_type.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="constr_SEQUENCE.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BIT_STRING.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ber_tlv_tag.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ber_tlv_length.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ber_decoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="asn_system.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="asn_internal.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="asn_codecs_prim.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="asn_codecs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="asn_application.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

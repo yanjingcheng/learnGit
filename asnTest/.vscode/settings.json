@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "types.h": "c",
+        "rectangle.h": "c",
+        "asn_internal.h": "c",
+        "asn_application.h": "c",
+        "asn_codecs.h": "c"
+    }
+}
