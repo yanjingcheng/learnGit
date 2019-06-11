@@ -99,20 +99,21 @@ const std::string EUTRA_InterNode("EUTRA-InterNodeDefinitions");
 const std::string NBIOT_InterNode("NBIOT-InterNodeDefinitions");
 
 
-std::vector<std::string > vec_asn_global;
+std::vector<std::string> vec_asn_global;
 
-std::vector<std::string > vec_asn_EUTRA_RRC;
-std::vector<std::string > vec_asn_PC5_RRC;
-std::vector<std::string > vec_asn_NBIOT_RRC;
-std::vector<std::string > vec_asn_EUTRA_UE;
-std::vector<std::string > vec_asn_NBIOT_UE;
-std::vector<std::string > vec_asn_EUTRA_Sidelink;
-std::vector<std::string > vec_asn_EUTRA_InterNode;
-std::vector<std::string > vec_asn_NBIOT_InterNode;
+std::vector<std::string> vec_asn_EUTRA_RRC;
+std::vector<std::string> vec_asn_PC5_RRC;
+std::vector<std::string> vec_asn_NBIOT_RRC;
+std::vector<std::string> vec_asn_EUTRA_UE;
+std::vector<std::string> vec_asn_NBIOT_UE;
+std::vector<std::string> vec_asn_EUTRA_Sidelink;
+std::vector<std::string> vec_asn_EUTRA_InterNode;
+std::vector<std::string> vec_asn_NBIOT_InterNode;
 
-std::vector<std::string > vec_title_str;
-
-std::vector<std::string> vec_body_str;
+std::vector<std::string> vec_title_str;
+std::vector<std::string> vec_outermost_str;// 最外层的asn :: SEQUENCE{...}
+std::vector<std::string> vec_body_str; //仅仅存储body内容，
+std::vector<std::string> vec_body_next_tag_str; //子信元类型对象
 
 std::map<std::string, std::vector<std::string>&> module_map;
 
@@ -123,36 +124,42 @@ std::string output_file;
 std::string input_file = "D:/3gpp/36331-ea0/36331-ea0.txt";
 bool startFlg(false);
 bool endFlg(false);
-std::vector<std::string> basic_type;
-std::vector<std::string> composite_type;
-std::vector<std::string> import_asn;
+std::vector<std::string> vec_basic_type;
+std::vector<std::string> vec_composite_type;
+std::vector<std::string> vec_import_asn;
 
+std::string moduleName;//导入的模块名称
+const int continu = 0;//分析body中的每一行，找到需要继续递归search的tag
+int body_lbrace = 0;//分析body中的每一行，body中的左'{'
+int body_rbrace = 0;//分析body中的每一行，body中的左'}'
 
+int next_tag = 0; //每行只有变量名，没有值对象，需要查找下面一行
+std::string next_tag_var;
 
-//static int extract_module(std::vector<std::string>& all_asn_list) {
-//	std::string getline;
-//	std::string moduleName;
-//	std::map<std::string, std::vector<std::string>>::iterator it;
-//	; //当前vec
-//
-//	std::vector<std::string>::iterator asn_list_iter;
-//	for (asn_list_iter = all_asn_list.begin(); asn_list_iter != all_asn_list.end(); asn_list_iter++) {
-//		getline = *asn_list_iter;
-//		if (((getline.find("DEFINITIONS AUTOMATIC TAGS") != std::string::npos))) {
-//			//std::cout << getline << std::endl;
-//			moduleName = getline.substr(0, getline.find(" "));
-//			it = module_map.find(moduleName);
-//			std::vector<std::string> &vecAction = it->second;
-//		}
-//	}
-//	/*if (vecAction.size()) {
-//		sort_module(moduleName ,vecAction);
-//	}*/
-//
-//
-//
-//	return 0;
-//}
+static int segment_str(std::string& lineStr) {
+	regex patternHeader1("(\\s*)([0-9A-Za-z\\-_\\.]*)(\\s*)([0-9A-Za-z\\-_\\.]*)(\\s*)([\\{]*)");
+	std::string varible = regex_replace(lineStr, patternHeader1, std::string("$2"));//以括号为组，变量
+	std::string value = regex_replace(lineStr, patternHeader1, std::string("$4"));//值对象
+	
+	if (next_tag) {
+		regex patternHeader2("(\\s*)([0-9A-Za-z\\-_\\.]*)(,)(\\s*)");
+		std::string subObject = regex_replace(lineStr, patternHeader2, std::string("$2"));
+		if (!subObject.empty()) { //如果不为空，暂且加入到vec中，待后续递归查找
+			vec_body_next_tag_str.push_back(subObject);
+			return 1;
+		}
+	}
+	/* 如果值为空，则继续找下一行 */
+	if (value.empty() && !next_tag) {
+		next_tag = 1;
+		return(-1);
+	}
+	
+	else {
+		vec_body_str.push_back(value);
+	}
+	return 0;
+}
 
 static void product_file(std::string& moduleName, std::vector<std::string> *vecAction) {
 	std::vector<std::string >::iterator itr;
@@ -215,9 +222,7 @@ static int sort_module() {
 	
 	return 0;
 }
-const int continu = 0;
-int body_lbrace = 0;
-int body_rbrace = 0;
+
 static int analysis(std::string& analysis_line_str) {
 	if (analysis_line_str.find("{") != std::string::npos) {
 		body_lbrace++;
@@ -228,7 +233,8 @@ static int analysis(std::string& analysis_line_str) {
 		body_rbrace++;
 		return continu;
 	}
-	//strtok_s();
+	(void)segment_str(analysis_line_str);
+	return 0;
 }
 static int brace_count(std::string& str, int& left, int& right) {
 	int start = 0;
@@ -243,17 +249,14 @@ static int brace_count(std::string& str, int& left, int& right) {
 	return (left - right);
 }
 
-static void parse_vec_asn_NBIOT_RRC() {
-	//vec_asn_NBIOT_RRC
-	std::string moduleName;
-	std::vector<std::string >::iterator itr;
-	std::vector<std::string >::iterator subItr;
-	std::vector<std::string >::iterator importItr;
-	std::map<std::string, std::vector<std::string>>::iterator it;
-	std::vector<std::string> *vecAction = nullptr; 
-
+/*
+	找到需要导入的模块名称以及具体需要导入的信元对象，加入到vec_import_asn中
+*/
+static int find_import_content() {
+	
 	std::string tmpStr;
 	std::string tmpStrHandle;
+	std::vector<std::string>::iterator itr;
 	bool import_start(false);
 	for (itr = vec_asn_NBIOT_RRC.begin(); itr != vec_asn_NBIOT_RRC.end(); ++itr) {
 		tmpStr = *itr;
@@ -264,51 +267,61 @@ static void parse_vec_asn_NBIOT_RRC() {
 		else if (tmpStr.find("FROM") != std::string::npos) {
 			int idx = tmpStr.find(" ");
 			moduleName = tmpStr.substr(idx + 1, tmpStr.length() - idx - 2);
-			vecAction = &(module_map.find(moduleName)->second);//找到IMPORT ...FROM 具体模块
+			//vecAction = &(module_map.find(moduleName)->second);//找到IMPORT ...FROM 具体模块
 			break;
 		}
 		else if (import_start && tmpStr.size()) {
 			tmpStrHandle = tmpStr.substr(tmpStr.find_first_not_of("\\\t"), tmpStr.find_first_of(",") - 1);//去除不需要的字符
-			import_asn.push_back(tmpStrHandle);//找到需要导入的asn组 e.g. RRCConnectionReestablishmentReject
+			vec_import_asn.push_back(tmpStrHandle);//找到需要导入的asn组 e.g. RRCConnectionReestablishmentReject
 		}
 	}
+	return 0;
+}
+/*
+	从需要导入的vec中遍历
+	RRCConnectionReestablishmentReject ::= SEQUENCE {
+			criticalExtensions					CHOICE {
+			rrcConnectionReestablishmentReject-r8
+										RRCConnectionReestablishmentReject-r8-IEs,
+			criticalExtensionsFuture			SEQUENCE {}
+		}
+	}
+*/
 
+static void parse_vec_asn_NBIOT_RRC() {
+	//vec_asn_NBIOT_RRC
+	std::vector<std::string>::iterator subItr;
+	std::vector<std::string>::iterator importItr;
+	std::map<std::string, std::vector<std::string>>::iterator it;
+	std::vector<std::string> *vecAction = nullptr; 
+
+	std::string tmpStr;
 	
-	int line_num = -1;
-	int idx = 0;
+	vecAction = &(module_map.find(moduleName)->second);//找到IMPORT ...FROM 具体模块
 	int ret = 0;
 	int left_brace = 0;//左大括号
 	int right_brace = 0;//右大括号
 	bool startExtractFlg(false);
-	std::vector<std::string> extractLine;
+	
 	std::string import_line_module;// 导入的每行RRCConnectionReestablishmentReject模块名
-	for (importItr = import_asn.begin(); importItr != import_asn.end(); ++importItr) {
+	for (importItr = vec_import_asn.begin(); importItr != vec_import_asn.end(); ++importItr) {
 		import_line_module = *importItr;
-		/*
-			从需要导入的vec中遍历
-			RRCConnectionReestablishmentReject ::= SEQUENCE {
-					criticalExtensions					CHOICE {
-					rrcConnectionReestablishmentReject-r8
-												RRCConnectionReestablishmentReject-r8-IEs,
-					criticalExtensionsFuture			SEQUENCE {}
-				}
-			}
-		*/
-		regex patternHeader("(\\s*)" + import_line_module + "(\\s*)(::=)(\\s+)([0-9A-Za-z\\-_\\.]+)(\\s+)(\\{)");
 		
+		/* 正则匹配最外层头和尾 */
+		regex patternHeader("(\\s*)" + import_line_module + "(\\s*)(::=)(\\s+)([0-9A-Za-z\\-_\\.]+)(\\s+)(\\{)");
 		regex patternTail("(\\s*)(\\})(\\s*)");
-		for (subItr = vecAction->begin(); subItr != vecAction->end(); ++subItr,++idx) {
+		for (subItr = vecAction->begin(); subItr != vecAction->end(); ++subItr) {
 			tmpStr = *subItr;
 			int cmp = brace_count(tmpStr, left_brace, right_brace);//比较'{'和'}'个数
 			if (regex_match(tmpStr, patternHeader) && !startExtractFlg){
 				startExtractFlg = true;
-				extractLine.push_back(tmpStr);		
+				vec_outermost_str.push_back(tmpStr);
 			}
 			else if (startExtractFlg) {
-				ret = analysis(tmpStr);
-				extractLine.push_back(tmpStr);
+				ret = analysis(tmpStr);// 分析内部的信元对象是基本类型、复合类型还是存在其它子类型
+				vec_outermost_str.push_back(tmpStr);
 				if (regex_match(tmpStr, patternTail) && !cmp) {
-					startExtractFlg = false;
+					startExtractFlg = false;//最外层的asn结束,接着递归里面的信元对象
 					break;
 				}
 			}
@@ -376,18 +389,19 @@ int main() {
 	{EUTRA_InterNodeDefinitions,vec_asn_EUTRA_InterNode},
 	{NBIOT_InterNodeDefinitions,vec_asn_NBIOT_InterNode}
 }*/
-	std::cout << input_file.c_str() << std::endl;
+	/*std::cout << input_file.c_str() << std::endl;
 	std::string tmpStr("  RRCConnectionReestablishmentReject ::= SEQUENCE {");
 	std::string email("   yjcdoc@163.com");
-	std::string nameMod("criticalExtensions					CHOICE {");
-	char name[] = "criticalExtensions,CHOICE";
-	char* buf = nullptr;
-	strtok_s(name,",", &buf);
-
+	std::string nameMod(" criticalExtensions					CHOICE {");
+	regex pattern("([0-9A-Za-z\\-_\\.]+)@(([a-zA-Z0-9\\-])+\\.+[a-z]{2,3}(\\.[a-z]{2})?)");
+	
+	regex patternHeader("(\\s*)([0-9A-Za-z\\-_\\.]+)(\\s+)([0-9A-Za-z\\-_\\.]+)(\\s+)(\\{)");
+	std::string name = regex_replace(nameMod, patternHeader, std::string("$6"));
+	segment_str(nameMod);
 	std::string test_str("FROM EUTRA-RRC-Definitions;");
 	int idx = test_str.find(" ");
-	std::string ret = test_str.substr(test_str.find(" ")+1, test_str.length()-idx-2);
-
+	std::string ret = test_str.substr(test_str.find(" ")+1, test_str.length()-idx-2)*/;
+	
 	std::fstream input;
 	std::string input_line;
 	const unsigned long cul_asn_idle = 0x0;
@@ -430,20 +444,22 @@ int main() {
 	
 	//extract_module(vec_asn_global);
 	sort_module();
-	basic_type.push_back("BOOL");
-	basic_type.push_back("INTEGER");
-	basic_type.push_back("REAL");
-	basic_type.push_back("BIT STRING");
-	basic_type.push_back("OCTET STRING");
-	basic_type.push_back("ENUMERATED");
-	basic_type.push_back("OBJECT IDENTIFIER");
-	basic_type.push_back("NULL");
-	composite_type.push_back("SEQENCE");
-	composite_type.push_back("SET");
-	composite_type.push_back("CHOICE");
-	composite_type.push_back("SEQENCE OF");
-	composite_type.push_back("SET OF");
+	vec_basic_type.push_back("BOOL");
+	vec_basic_type.push_back("INTEGER");
+	vec_basic_type.push_back("REAL");
+	vec_basic_type.push_back("BIT STRING");
+	vec_basic_type.push_back("OCTET STRING");
+	vec_basic_type.push_back("ENUMERATED");
+	vec_basic_type.push_back("OBJECT IDENTIFIER");
+	vec_basic_type.push_back("NULL");
+	vec_composite_type.push_back("SEQENCE");
+	vec_composite_type.push_back("SET");
+	vec_composite_type.push_back("CHOICE");
+	vec_composite_type.push_back("SEQENCE OF");
+	vec_composite_type.push_back("SET OF");
 
+
+	find_import_content();
 	parse_vec_asn_NBIOT_RRC();
 
 	/***/
